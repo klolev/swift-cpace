@@ -5,7 +5,7 @@
 //  Created by chloele on 2026-10-28.
 //
 
-enum StringUtils {
+public enum StringUtils {
     /// prepend LEB128 encoding of length
     static func prependLength(data: [UInt8]) -> [UInt8] {
         var length = data.count
@@ -23,7 +23,7 @@ enum StringUtils {
         return encoded + data
     }
 
-    static func lvCat(_ parts: [UInt8]...) -> [UInt8] {
+    public static func lvCat(_ parts: [UInt8]...) -> [UInt8] {
         parts.flatMap(prependLength(data:))
     }
     

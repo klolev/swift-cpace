@@ -29,7 +29,7 @@ extension CPace {
             )
         }
 
-        public consuming func confirm(peerTag: [UInt8], info: [UInt8]) throws -> [UInt8] {
+        public consuming func confirm(peerTag: [UInt8], info: [UInt8]) throws (ConfirmationError) -> [UInt8] {
             guard hash.isValidAuthenticationCode(key, peerMessage, peerTag) else {
                 throw ConfirmationError.confirmationFailed
             }

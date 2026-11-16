@@ -35,7 +35,7 @@ extension CPace {
                     ad: [UInt8],
                     prs: [UInt8],
                     ci: [UInt8],
-                    sid: [UInt8]) throws {
+                    sid: [UInt8]) throws (SessionError) {
             self.group = group
             self.hash = hash
             self.role = role
@@ -49,7 +49,7 @@ extension CPace {
             self.Y = Y
         }
         
-        public consuming func finish(peerY: [UInt8], peerAD: [UInt8]) throws -> PendingConfirmation {
+        public consuming func finish(peerY: [UInt8], peerAD: [UInt8]) throws (SessionError) -> PendingConfirmation {
             let K = group.scalarMultVfy(y, peerY)
             guard K != group.identity else {
                 throw SessionError.identity

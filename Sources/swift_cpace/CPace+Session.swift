@@ -57,7 +57,11 @@ extension CPace {
                 throw SessionError.identity
             }
             
-            guard peerY != Y, peerAD != AD else {
+            guard peerY != Y else {
+                throw SessionError.loopback
+            }
+            
+            if case .symmetric = role, peerAD == AD {
                 throw SessionError.loopback
             }
             

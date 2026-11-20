@@ -30,4 +30,18 @@ public enum StringUtils {
     static func transcriptIR(Ya: [UInt8], ADa: [UInt8], Yb: [UInt8], ADb: [UInt8]) -> [UInt8] {
         lvCat(Ya, ADa) + lvCat(Yb, ADb)
     }
+    
+    static func lexicographicallyLarger(_ a: [UInt8], _ b: [UInt8]) -> Bool {
+        zip(a, b)
+            .first(where: { $0 != $1 })
+            .map { $0 > $1 } ?? (a.count > b.count)
+    }
+    
+    static func transcriptOC(Ya: [UInt8], ADa: [UInt8], Yb: [UInt8], ADb: [UInt8]) -> [UInt8] {
+        oCat(lvCat(Ya, ADa), lvCat(Yb, ADb))
+    }
+    
+    static func oCat(_ a: [UInt8], _ b: [UInt8]) -> [UInt8] {
+        Array("oc".utf8) + (lexicographicallyLarger(a, b) ? a + b : b + a)
+    }
 }

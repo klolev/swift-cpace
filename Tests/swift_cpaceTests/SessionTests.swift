@@ -144,6 +144,31 @@ fileprivate let Yb = hexStringToBytes("3ea7e0b19560d7c0b0f5734f63b955286dfa8232b
     #expect(keyB == expected.withUnsafeBytes(Array.init))
 }
 
+@Test func `B.3.6. Test vector for ISK calculation parallel execution`() throws {
+    let transcript = StringUtils.transcriptOC(
+        Ya: Ya,
+        ADa: ADa,
+        Yb: Yb,
+        ADb: ADb
+    )
+    #expect(transcript == hexStringToBytes("6f6320d6bac480f2c386c394efc7c47adb9925dcd2630b64f240c50f8d0eec482b915703414461203ea7e0b19560d7c0b0f5734f63b955286dfa8232b5ebe63324e2d9e7433f725803414462"))
+    
+    let a = try CPace.Session(group: .Ristretto255, hash: .Sha512, role: .symmetric, scalar: ya, ad: ADa, prs: prs, ci: ci, sid: sid)
+    let b = try CPace.Session(group: .Ristretto255, hash: .Sha512, role: .symmetric, scalar: yb, ad: ADb, prs: prs, ci: ci, sid: sid)
+    let pendingA = try a.finish(peerY: Yb, peerAD: ADb)
+    let pendingB = try b.finish(peerY: Ya, peerAD: ADa)
+
+    #expect(pendingA.isk == hexStringToBytes("544199d71f62f8d9a1fee55727e24fe4a45844593c2b6013c4fa3969d0e5debb2244675c0b43397cbb68d342b01fc0f98fc961469a25134de9f0f813c1a57476"))
+    #expect(pendingB.isk == pendingA.isk)
+}
+
+@Test func `Parallel execution loopback throws`() throws {
+    #expect(throws: CPace.Session.SessionError.loopback) {
+        let a = try CPace.Session(group: .Ristretto255, hash: .Sha512, role: .symmetric, scalar: ya, ad: ADa, prs: prs, ci: ci, sid: sid)
+        _ = try a.finish(peerY: Ya, peerAD: ADa)
+    }
+}
+
 fileprivate func expectConfirmationFails(_ pending: consuming CPace.PendingConfirmation,
                                          peerTag: [UInt8],
                                          sourceLocation: SourceLocation = #_sourceLocation) {

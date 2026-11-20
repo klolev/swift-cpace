@@ -21,11 +21,13 @@ extension CPace {
         public enum SessionError: Error {
             case scalarMultError
             case identity
+            case loopback
         }
         
         public enum Role {
             case initiator
             case responder
+            case symmetric
         }
         
         public init(group: Group,
@@ -55,12 +57,18 @@ extension CPace {
                 throw SessionError.identity
             }
             
+            guard peerY != Y, peerAD != AD else {
+                throw SessionError.loopback
+            }
+            
             let firstPart = StringUtils.lvCat(group.dsi + Array("_ISK".utf8), sid, K)
             let secondPart = switch role {
             case .initiator:
                 StringUtils.transcriptIR(Ya: Y, ADa: AD, Yb: peerY, ADb: peerAD)
             case .responder:
                 StringUtils.transcriptIR(Ya: peerY, ADa: peerAD, Yb: Y, ADb: AD)
+            case .symmetric:
+                StringUtils.transcriptOC(Ya: Y, ADa: AD, Yb: peerY, ADb: peerAD)
             }
             
             let isk = hash.hash(firstPart + secondPart)
